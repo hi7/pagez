@@ -17,10 +17,12 @@ pub fn main() anyerror!void {
     var bitmap = try allocator.alloc(u8, size);
     defer allocator.free(bitmap);
 
-    try draw(bitmap, res);
+    const fb = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
+    defer fb.close();
+    try draw(bitmap, res, fb);
 }
 
-fn draw(bitmap: []u8, res: Point) anyerror!void {
+fn draw(bitmap: []u8, res: Point, fb: fs.File) anyerror!void {
     clear(bitmap);
 
     const white: Vector(4, u8) = .{ 255, 255, 255, 255 };
@@ -29,9 +31,6 @@ fn draw(bitmap: []u8, res: Point) anyerror!void {
     const blue = [4]u8{ 255, 0, 0, 255 };
     pixel(blue, 1, 1, bitmap, res);
     pixel(blue, res.x - 2, 1, bitmap, res);
-
-    const fb = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
-    defer fb.close();
 
     try flush(bitmap, fb);
 }
