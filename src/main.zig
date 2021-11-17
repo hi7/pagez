@@ -79,6 +79,7 @@ fn clear(bitmap: []u8) void {
     }
 }
 
-test "fb0 exists" {
+test "files exists" {
     try fs.accessAbsolute("/dev/fb0", .{ .write = true });
+    try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
 }
