@@ -24,13 +24,13 @@ pub fn main() anyerror!void {
 
 fn draw(bitmap: []u8, res: Point, fb: fs.File) anyerror!void {
     clear(bitmap);
-
+    // TODO: use u32 for color
     const white: Vector(4, u8) = .{ 255, 255, 255, 255 };
-    pixel(white, 0, 0, bitmap, res);
-    pixel(white, res.x - 1, 0, bitmap, res);
-    const blue = [4]u8{ 255, 0, 0, 255 };
-    pixel(blue, 1, 1, bitmap, res);
-    pixel(blue, res.x - 2, 1, bitmap, res);
+    box(white, Point{ .x = 0, .y = 0},  Point{ .x = 8, .y = 8}, bitmap, res);
+    box(white, Point{ .x = res.x-9, .y = 0},  Point{ .x = 8, .y = 8}, bitmap, res);
+    const cyan = [4]u8{ 255, 255, 0, 255 };
+    box(cyan, Point{ .x = 8, .y = 5},  Point{ .x = 3, .y = 3}, bitmap, res);
+    box(cyan, Point{ .x = res.x-12, .y = 5},  Point{ .x = 3, .y = 3}, bitmap, res);
 
     try flush(bitmap, fb);
 }
@@ -61,12 +61,31 @@ fn resolution() anyerror!Point {
     return Point{ .x = width, .y = height };
 }
 
+fn calcPos(x: u16, y: u16, res: Point) u16 {
+   return (res.x * y + x) * 4;
+}
+
 fn pixel(color: Vector(4, u8), x: u16, y: u16, bitmap: []u8, res: Point) void {
-    const pos = (res.x * y + x) * 4;
-    bitmap[pos] = color[0];
-    bitmap[pos + 1] = color[1];
-    bitmap[pos + 2] = color[2];
-    bitmap[pos + 3] = color[3];
+    const offset = calcPos(x, y, res);
+    bitmap[offset] = color[0];
+    bitmap[offset + 1] = color[1];
+    bitmap[offset + 2] = color[2];
+    bitmap[offset + 3] = color[3];
+}
+
+fn box(color: Vector(4, u8), pos: Point, size: Point, bitmap: []u8, res: Point) void {
+    const offset = calcPos(pos.x, pos.y, res);
+    var dx: u16 = 0;
+    var dy: u16 = 0;
+    while (dy < size.y) : (dy += 1) {
+        while (dx < size.x*4) : (dx += 4) {
+            bitmap[offset + dy * res.x * 4 + dx] = color[0];
+            bitmap[offset + dy * res.x * 4 + dx + 1] = color[1];
+            bitmap[offset + dy * res.x * 4 + dx + 2] = color[2];
+            bitmap[offset + dy * res.x * 4 + dx + 3] = color[3];
+        }
+        dx = 0;
+    }
 }
 
 fn flush(bitmap: []u8, fb: fs.File) fs.File.PWriteError!void {
