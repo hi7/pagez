@@ -62,7 +62,7 @@ fn resolution() anyerror!Point {
 }
 
 fn calcPos(x: u16, y: u16, res: Point) u16 {
-   return (res.x * y + x) * 4;
+   return (res.x * y + x) *% @as(u16, 4);
 }
 
 fn pixel(color: Vector(4, u8), x: u16, y: u16, bitmap: []u8, res: Point) void {
@@ -78,11 +78,12 @@ fn box(color: Vector(4, u8), pos: Point, size: Point, bitmap: []u8, res: Point) 
     var dx: u16 = 0;
     var dy: u16 = 0;
     while (dy < size.y) : (dy += 1) {
+        const yoffset:u32 = dy * res.x * @as(u32, 4);
         while (dx < size.x*4) : (dx += 4) {
-            bitmap[offset + dy * res.x * 4 + dx] = color[0];
-            bitmap[offset + dy * res.x * 4 + dx + 1] = color[1];
-            bitmap[offset + dy * res.x * 4 + dx + 2] = color[2];
-            bitmap[offset + dy * res.x * 4 + dx + 3] = color[3];
+            bitmap[offset + yoffset + dx] = color[0];
+            bitmap[offset + yoffset + dx + 1] = color[1];
+            bitmap[offset + yoffset + dx + 2] = color[2];
+            bitmap[offset + yoffset + dx + 3] = color[3];
         }
         dx = 0;
     }
