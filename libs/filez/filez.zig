@@ -20,11 +20,6 @@ pub fn openMouse() !void {
     mouseFile = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true });
 }
 
-test "open mouse" {
-    try openMouse();
-    exit();
-}
-
 ///`pub fn readMouse() !Mouse` blocking call to read position offset and mouse button status.
 pub fn readMouse() !Mouse {
     var buf: [3]u8 = undefined;
