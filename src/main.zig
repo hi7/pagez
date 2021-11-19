@@ -25,11 +25,13 @@ pub fn main() anyerror!void {
     try filez.openMouse();
     var m = try filez.readMouse();
     var mp = Point{ .x = res.x / 2, .y = res.y / 2 };
+    const c: Vector(4, u8) = .{ 0, 255, 255, 255 };
+    box(c, mp,  Point{ .x = 4, .y = 4}, bitmap, res);
     while (!m.lmb) {
-        const white: Vector(4, u8) = .{ 255, 255, 255, 255 };
         mp.x = @intCast(u16, (@intCast(i16, mp.x) + @intCast(i16, m.dx)));
-        mp.y = @intCast(u16, (@intCast(i16, mp.y) + @intCast(i16, m.dy)));
-        box(white, mp,  Point{ .x = 8, .y = 8}, bitmap, res);
+        mp.y = @intCast(u16, (@intCast(i16, mp.y) + @intCast(i16, m.dy) * -1));
+        box(c, mp,  Point{ .x = 8, .y = 8}, bitmap, res);
+        try flush(bitmap, fb);
         m = try filez.readMouse();
     }
     filez.exit();
@@ -103,6 +105,7 @@ fn box(color: Vector(4, u8), pos: Point, size: Point, bitmap: []u8, res: Point) 
 }
 
 fn flush(bitmap: []u8, fb: fs.File) fs.File.PWriteError!void {
+    try fb.seekTo(0);
     _ = try fb.write(bitmap);
 }
 
