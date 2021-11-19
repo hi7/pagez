@@ -6,7 +6,7 @@ const mem = std.mem;
 const Point = pagez.Point;
 const expect = std.testing.expect;
 
-pub fn main() anyerror!void {
+pub fn main() !void {
     try pagez.init();
     try draw();
 
@@ -23,7 +23,7 @@ pub fn main() anyerror!void {
     pagez.exit();
 }
 
-fn draw() anyerror!void {
+fn draw() !void {
     pagez.clear();
     gui.box(gui.white, Point{ .x = 0, .y = 0},  Point{ .x = 8, .y = 8});
     gui.box(gui.white, Point{ .x = pagez.display_size.x-9, .y = 0},  Point{ .x = 8, .y = 8});
