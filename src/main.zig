@@ -16,9 +16,9 @@ pub fn main() !void {
     gui.box(gui.white, mp, Point{ .x = 4, .y = 4});
     while (!m.lmb) {
         mp.x = @intCast(u16, max(0, (@intCast(i16, mp.x) + @intCast(i16, m.dx))));
-        if (mp.x >= pagez.display_size.x) { mp.x = pagez.display_size.x - 1; }
+        if (mp.x >= pagez.display_size.x - 8) { mp.x = pagez.display_size.x - 1; }
         mp.y = @intCast(u16, max(0, (@intCast(i16, mp.y) + @intCast(i16, m.dy) * -1)));
-        if (mp.y >= pagez.display_size.y) { mp.y = pagez.display_size.y - 1; }
+        if (mp.y >= pagez.display_size.y - 8) { mp.y = pagez.display_size.y - 1; }
         gui.box(gui.yellow, mp, Point{ .x = 8, .y = 8});
         try pagez.flush();
         m = try pagez.readMouse();
