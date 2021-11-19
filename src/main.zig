@@ -15,8 +15,6 @@ pub fn main() !void {
 
     var m = try pagez.readMouse();
     var mp = Point{ .x = pagez.display_size.x / 2, .y = pagez.display_size.y / 2 };
-    gui.box(gui.white, mp, Point{ .x = 4, .y = 4});
-
     var bg = Vector(4, u8) { 0, 0, 0, 0, };
     while (!m.lmb) {
         mp.x = @intCast(u16, max(0, (@intCast(i16, mp.x) + @intCast(i16, m.dx))));
