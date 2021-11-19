@@ -3,6 +3,7 @@ const pagez = @import("pagez");
 const gui = @import("gui");
 const fs = std.fs;
 const mem = std.mem;
+const max = std.math.max;
 const Point = pagez.Point;
 const expect = std.testing.expect;
 
@@ -14,8 +15,8 @@ pub fn main() !void {
     var mp = Point{ .x = pagez.display_size.x / 2, .y = pagez.display_size.y / 2 };
     gui.box(gui.white, mp, Point{ .x = 4, .y = 4});
     while (!m.lmb) {
-        mp.x = @intCast(u16, (@intCast(i16, mp.x) + @intCast(i16, m.dx)));
-        mp.y = @intCast(u16, (@intCast(i16, mp.y) + @intCast(i16, m.dy) * -1));
+        mp.x = @intCast(u16, max(0, (@intCast(i16, mp.x) + @intCast(i16, m.dx))));
+        mp.y = @intCast(u16, max(0, (@intCast(i16, mp.y) + @intCast(i16, m.dy) * -1)));
         gui.box(gui.yellow, mp, Point{ .x = 8, .y = 8});
         try pagez.flush();
         m = try pagez.readMouse();
