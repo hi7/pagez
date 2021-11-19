@@ -5,8 +5,12 @@ const File = fs.File;
 const Vector = std.meta.Vector;
 const print = std.debug.print;
 
+var arena: std.heap.ArenaAllocator = undefined;
+var allocator: *std.mem.Allocator = undefined;
 var fb0: File = undefined;
 var mouse0: File = undefined;
+var bitmap: []u8 = undefined;
+pub var display_size: Point = undefined;
 
 pub const Point = struct {
     x: u16, y: u16
@@ -26,28 +30,35 @@ pub const ParseError = error{
 
 ///`pub fn init() !void` call once before other functions.
 pub fn init() !void {
-    // user needs to be in group input:
-    // $ sudo adduser username input
     fb0 = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
+    // user needs to be in group input: $ sudo adduser username input
     mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true });
+    display_size = try resolution();
+    arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    allocator = &arena.allocator;
+    const mem_size: u32 = @as(u32, display_size.x) * @as(u32, display_size.y) * @as(u32, 4);
+    bitmap = try allocator.alloc(u8, mem_size);
 }
 ///`pub fn exit() void` call after using *readMouse()*.
 pub fn exit() void {
     fb0.close();
     mouse0.close();
+    allocator.free(bitmap);
+    arena.deinit();
 }
 
 test "files exists" {
-    try fs.accessAbsolute("/dev/fb0", .{ .write = true });
     try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
+    try fs.accessAbsolute("/dev/fb0", .{ .write = true });
+    try fs.accessAbsolute("/dev/input/mouse0", .{ .read = true });
 }
 
 pub fn resolution() anyerror!Point {
-    var res = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
-    defer res.close();
+    var virtual_size = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
+    defer virtual_size.close();
 
     var buf: [15]u8 = undefined;
-    var bytes_read = try res.readAll(&buf);
+    var bytes_read = try virtual_size.readAll(&buf);
     // remove line feed at the end
     if (!std.ascii.isDigit(buf[bytes_read])) { bytes_read -= 1; }
     const separator = std.mem.indexOf(u8, buf[0..bytes_read], ",");
@@ -63,24 +74,24 @@ pub fn resolution() anyerror!Point {
     return Point{ .x = width, .y = height };
 }
 
-fn calcPos(x: u16, y: u16, res: Point) u32 {
-   return (@as(u32, res.x) * @as(u32, y) + @as(u32, x)) *% @as(u32, 4);
+fn calcPos(x: u16, y: u16) u32 {
+   return (@as(u32, display_size.x) * @as(u32, y) + @as(u32, x)) *% @as(u32, 4);
 }
 
-pub fn pixel(color: Vector(4, u8), x: u16, y: u16, bitmap: []u8, res: Point) void {
-    const offset = calcPos(x, y, res);
+pub fn pixel(color: Vector(4, u8), x: u16, y: u16) void {
+    const offset = calcPos(x, y);
     bitmap[offset] = color[0];
     bitmap[offset + 1] = color[1];
     bitmap[offset + 2] = color[2];
     bitmap[offset + 3] = color[3];
 }
 
-pub fn box(color: Vector(4, u8), pos: Point, size: Point, bitmap: []u8, res: Point) void {
-    const offset = calcPos(pos.x, pos.y, res);
+pub fn box(color: Vector(4, u8), pos: Point, size: Point) void {
+    const offset = calcPos(pos.x, pos.y);
     var dx: u16 = 0;
     var dy: u16 = 0;
-    while (dy < size.y) : (dy += 1) {
-        const yoffset:u32 = dy * res.x * @as(u32, 4);
+    while (dy < display_size.y) : (dy += 1) {
+        const yoffset:u32 = dy * size.x * @as(u32, 4);
         while (dx < size.x*4) : (dx += 4) {
             bitmap[offset + yoffset + dx] = color[0];
             bitmap[offset + yoffset + dx + 1] = color[1];
@@ -91,12 +102,12 @@ pub fn box(color: Vector(4, u8), pos: Point, size: Point, bitmap: []u8, res: Poi
     }
 }
 
-pub fn flush(bitmap: []u8) fs.File.PWriteError!void {
+pub fn flush() fs.File.PWriteError!void {
     try fb0.seekTo(0);
     _ = try fb0.write(bitmap);
 }
 
-pub fn clear(bitmap: []u8) void {
+pub fn clear() void {
     for (bitmap) |_, index| {
         bitmap[index] = 0;
     }
