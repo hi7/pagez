@@ -2,14 +2,13 @@ const std = @import("std");
 const testing = std.testing;
 const fs = std.fs;
 const File = fs.File;
-const Vector = std.meta.Vector;
 const print = std.debug.print;
 
 var arena: std.heap.ArenaAllocator = undefined;
 var allocator: *std.mem.Allocator = undefined;
 var fb0: File = undefined;
 var mouse0: File = undefined;
-var bitmap: []u8 = undefined;
+pub var bitmap: []u8 = undefined;
 pub var display_size: Point = undefined;
 
 pub const Point = struct {
@@ -72,34 +71,6 @@ pub fn resolution() anyerror!Point {
         return ParseError.NoIntegerValue;
     };
     return Point{ .x = width, .y = height };
-}
-
-fn calcPos(x: u16, y: u16) u32 {
-   return (@as(u32, display_size.x) * @as(u32, y) + @as(u32, x)) *% @as(u32, 4);
-}
-
-pub fn pixel(color: Vector(4, u8), x: u16, y: u16) void {
-    const offset = calcPos(x, y);
-    bitmap[offset] = color[0];
-    bitmap[offset + 1] = color[1];
-    bitmap[offset + 2] = color[2];
-    bitmap[offset + 3] = color[3];
-}
-
-pub fn box(color: Vector(4, u8), pos: Point, size: Point) void {
-    const offset = calcPos(pos.x, pos.y);
-    var dx: u16 = 0;
-    var dy: u16 = 0;
-    while (dy < display_size.y) : (dy += 1) {
-        const yoffset:u32 = dy * size.x * @as(u32, 4);
-        while (dx < size.x*4) : (dx += 4) {
-            bitmap[offset + yoffset + dx] = color[0];
-            bitmap[offset + yoffset + dx + 1] = color[1];
-            bitmap[offset + yoffset + dx + 2] = color[2];
-            bitmap[offset + yoffset + dx + 3] = color[3];
-        }
-        dx = 0;
-    }
 }
 
 pub fn flush() fs.File.PWriteError!void {

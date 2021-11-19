@@ -13,6 +13,7 @@ pub fn build(b: *std.build.Builder) void {
 
     const exe = b.addExecutable("pagez", "src/main.zig");
     exe.addPackagePath("filez", "libs/core/filez.zig");
+    exe.addPackagePath("gui", "libs/core/gui.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
