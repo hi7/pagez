@@ -16,7 +16,6 @@ pub fn main() !void {
     var mp = Point{ .x = pagez.display_size.x / 2, .y = pagez.display_size.y / 2 };
     gui.box(gui.white, mp, Point{ .x = 4, .y = 4});
     while (!m.lmb) {
-        try draw();
         mp.x = @intCast(u16, max(0, (@intCast(i16, mp.x) + @intCast(i16, m.dx))));
         if (mp.x + 8 >= pagez.display_size.x) { mp.x = pagez.display_size.x - 9; }
         mp.y = @intCast(u16, max(0, (@intCast(i16, mp.y) + @intCast(i16, m.dy) * -1)));
