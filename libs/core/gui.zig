@@ -28,12 +28,12 @@ pub fn box(color: Vector(4, u8), pos: Point, size: Point) void {
     var dx: u16 = 0;
     var dy: u16 = 0;
     while (dy < pagez.display_size.y) : (dy += 1) {
-        const yoffset:u32 = dy * size.x * @as(u32, 4);
+        const y_offset:u32 = dy * size.x * @as(u32, 4);
         while (dx < size.x*4) : (dx += 4) {
-            pagez.bitmap[offset + yoffset + dx] = color[0];
-            pagez.bitmap[offset + yoffset + dx + 1] = color[1];
-            pagez.bitmap[offset + yoffset + dx + 2] = color[2];
-            pagez.bitmap[offset + yoffset + dx + 3] = color[3];
+            pagez.bitmap[offset + y_offset + dx] = color[0];
+            pagez.bitmap[offset + y_offset + dx + 1] = color[1];
+            pagez.bitmap[offset + y_offset + dx + 2] = color[2];
+            pagez.bitmap[offset + y_offset + dx + 3] = color[3];
         }
         dx = 0;
     }
