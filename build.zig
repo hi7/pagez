@@ -12,7 +12,7 @@ pub fn build(b: *std.build.Builder) void {
     const mode = b.standardReleaseOptions();
 
     const exe = b.addExecutable("pagez", "src/main.zig");
-    exe.addPackagePath("filez", "libs/filez/filez.zig");
+    exe.addPackagePath("filez", "libs/core/filez.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();
