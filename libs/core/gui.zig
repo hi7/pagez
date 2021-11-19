@@ -27,8 +27,8 @@ pub fn box(color: Vector(4, u8), pos: Point, size: Point) void {
     const offset = calcPos(pos.x, pos.y);
     var dx: u16 = 0;
     var dy: u16 = 0;
-    while (dy < pagez.display_size.y) : (dy += 1) {
-        const y_offset:u32 = dy * size.x * @as(u32, 4);
+    while (dy < size.y) : (dy += 1) {
+        const y_offset:u32 = dy * pagez.display_size.x * @as(u32, 4);
         while (dx < size.x*4) : (dx += 4) {
             pagez.bitmap[offset + y_offset + dx] = color[0];
             pagez.bitmap[offset + y_offset + dx + 1] = color[1];
