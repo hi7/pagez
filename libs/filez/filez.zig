@@ -5,7 +5,8 @@ const File = fs.File;
 const Vector = std.meta.Vector;
 const print = std.debug.print;
 
-var mouseFile: File = undefined;
+var fb0: File = undefined;
+var mouse0: File = undefined;
 
 pub const Point = struct {
     x: u16, y: u16
@@ -22,6 +23,24 @@ pub const ParseError = error{
       SeparatorNotFound,
       NoIntegerValue,
 };
+
+///`pub fn init() !void` call once before other functions.
+pub fn init() !void {
+    // user needs to be in group input:
+    // $ sudo adduser username input
+    fb0 = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
+    mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true });
+}
+///`pub fn exit() void` call after using *readMouse()*.
+pub fn exit() void {
+    fb0.close();
+    mouse0.close();
+}
+
+test "files exists" {
+    try fs.accessAbsolute("/dev/fb0", .{ .write = true });
+    try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
+}
 
 pub fn resolution() anyerror!Point {
     var res = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
@@ -72,9 +91,9 @@ pub fn box(color: Vector(4, u8), pos: Point, size: Point, bitmap: []u8, res: Poi
     }
 }
 
-pub fn flush(bitmap: []u8, fb: fs.File) fs.File.PWriteError!void {
-    try fb.seekTo(0);
-    _ = try fb.write(bitmap);
+pub fn flush(bitmap: []u8) fs.File.PWriteError!void {
+    try fb0.seekTo(0);
+    _ = try fb0.write(bitmap);
 }
 
 pub fn clear(bitmap: []u8) void {
@@ -83,23 +102,11 @@ pub fn clear(bitmap: []u8) void {
     }
 }
 
-test "files exists" {
-    try fs.accessAbsolute("/dev/fb0", .{ .write = true });
-    try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
-}
-
-///`pub fn openMouse() !void` call once before *readMouse()*.
-pub fn openMouse() !void {
-    // user needs to be in group input:
-    // $ sudo adduser username input
-    mouseFile = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true });
-}
-
 ///`pub fn readMouse() !Mouse` blocking call to read position offset and mouse button status.
 pub fn readMouse() !Mouse {
     var buf: [3]u8 = undefined;
     // Following call is blocking!!!
-    var bytes_read = try mouseFile.readAll(&buf);
+    var bytes_read = try mouse0.readAll(&buf);
     return Mouse {
         .dx = if (buf[1] >= 0x80) @intCast(i8, ~(buf[1] -% 1))*-1 else @intCast(i8, buf[1]),
         .dy = if (buf[2] >= 0x80) @intCast(i8, ~(buf[2] -% 1))*-1 else @intCast(i8, buf[2]),
@@ -117,9 +124,4 @@ test "read mouse" {
     try testing.expect(m.lmb == true);
     try testing.expect(m.rmb == false);
     exit();
-}
-
-///`pub fn exit() void` call after using *readMouse()*.
-pub fn exit() void {
-    mouseFile.close();
 }
