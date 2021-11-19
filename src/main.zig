@@ -1,4 +1,5 @@
 const std = @import("std");
+const filez = @import("filez");
 const fs = std.fs;
 const mem = std.mem;
 const Vector = std.meta.Vector;
@@ -20,6 +21,18 @@ pub fn main() anyerror!void {
     const fb = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
     defer fb.close();
     try draw(bitmap, res, fb);
+
+    try filez.openMouse();
+    var m = try filez.readMouse();
+    var mp = Point{ .x = res.x / 2, .y = res.y / 2 };
+    while (!m.lmb) {
+        const white: Vector(4, u8) = .{ 255, 255, 255, 255 };
+        mp.x = @intCast(u16, (@intCast(i16, mp.x) + @intCast(i16, m.dx)));
+        mp.y = @intCast(u16, (@intCast(i16, mp.y) + @intCast(i16, m.dy)));
+        box(white, mp,  Point{ .x = 8, .y = 8}, bitmap, res);
+        m = try filez.readMouse();
+    }
+    filez.exit();
 }
 
 fn draw(bitmap: []u8, res: Point, fb: fs.File) anyerror!void {
@@ -61,8 +74,8 @@ fn resolution() anyerror!Point {
     return Point{ .x = width, .y = height };
 }
 
-fn calcPos(x: u16, y: u16, res: Point) u16 {
-   return (res.x * y + x) *% @as(u16, 4);
+fn calcPos(x: u16, y: u16, res: Point) u32 {
+   return (@as(u32, res.x) * @as(u32, y) + @as(u32, x)) *% @as(u32, 4);
 }
 
 fn pixel(color: Vector(4, u8), x: u16, y: u16, bitmap: []u8, res: Point) void {
