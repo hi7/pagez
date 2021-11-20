@@ -9,9 +9,15 @@ var allocator: *std.mem.Allocator = undefined;
 var fb0: File = undefined;
 var mouse0: File = undefined;
 pub var bitmap: []u8 = undefined;
-pub var display_size: Point = undefined;
+pub var display_size: Size = undefined;
 
 pub const Point = struct {
+    x: i16, y: i16
+};
+pub const Position = struct {
+    x: u16, y: u16
+};
+pub const Size = struct {
     x: u16, y: u16
 };
 
@@ -47,17 +53,17 @@ pub fn exit() void {
 }
 
 test "files exists" {
-    try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
+    try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_Size", .{ .read = true });
     try fs.accessAbsolute("/dev/fb0", .{ .write = true });
     try fs.accessAbsolute("/dev/input/mouse0", .{ .read = true });
 }
 
-pub fn resolution() anyerror!Point {
-    var virtual_size = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
-    defer virtual_size.close();
+pub fn resolution() !Size {
+    var virtual_Size = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_Size", .{ .read = true });
+    defer virtual_Size.close();
 
     var buf: [15]u8 = undefined;
-    var bytes_read = try virtual_size.readAll(&buf);
+    var bytes_read = try virtual_Size.readAll(&buf);
     // remove line feed at the end
     if (!std.ascii.isDigit(buf[bytes_read])) { bytes_read -= 1; }
     const separator = std.mem.indexOf(u8, buf[0..bytes_read], ",");
@@ -70,7 +76,7 @@ pub fn resolution() anyerror!Point {
         std.debug.print("{s} is no u16 value\n", .{buf[(separator.?+1)..bytes_read]});
         return ParseError.NoIntegerValue;
     };
-    return Point{ .x = width, .y = height };
+    return Size{ .x = width, .y = height };
 }
 
 pub fn flush() fs.File.PWriteError!void {
