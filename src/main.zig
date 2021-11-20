@@ -4,7 +4,6 @@ const gui = @import("gui");
 const fs = std.fs;
 const mem = std.mem;
 const max = std.math.max;
-const Vector = std.meta.Vector;
 const Point = pagez.Point;
 const expect = std.testing.expect;
 
@@ -13,29 +12,46 @@ pub fn main() !void {
     try draw();
     try pagez.flush();
 
-    var m = try pagez.readMouse();
-    var mp = Point{ .x = pagez.display_size.x / 2, .y = pagez.display_size.y / 2 };
-    var bg = cursorBackground();
+    try waitForMouse();
+    var pos = center();
     while (!m.lmb) {
-        mp.x = @intCast(u16, max(0, (@intCast(i16, mp.x) + @intCast(i16, m.dx))));
-        if (mp.x + 8 >= pagez.display_size.x) { mp.x = pagez.display_size.x - 9; }
-        mp.y = @intCast(u16, max(0, (@intCast(i16, mp.y) + @intCast(i16, m.dy) * -1)));
-        if (mp.y + 8 >= pagez.display_size.y) { mp.y = pagez.display_size.y - 9; }
-
-        var i: u8 = 0;
-        const c = gui.colorAt(mp);
-        while (i < 4) : (i += 1) bg[i] = c[i];
-        gui.pixel(gui.yellow, mp);
-        try pagez.flush();
-        m = try pagez.readMouse();
-        gui.pixel(bg, mp);
+        updatePos(&pos);
+        try drawCursor(pos);
     }
     pagez.exit();
 }
 
-const cursor_dots = 1;
-fn cursorBackground() Vector(cursor_dots*4, u8)  {
-   return @splat(cursor_dots*4, @as(u8, 0));
+fn center() Point {
+    return Point{ .x = pagez.display_size.x / 2, .y = pagez.display_size.y / 2 };
+}
+
+const cursor_dots = 2;
+const cursor_bytes = cursor_dots * 4;
+fn cursorBackground() [cursor_bytes]u8 {
+   return @splat(cursor_bytes, @as(u8, 0));
+}
+
+var bg = cursorBackground();
+fn drawCursor(pos: Point) !void {
+    var i: u8 = 0;
+    const c = gui.colorAt(pos);
+    while (i < 4) : (i += 1) bg[i] = c[i];
+    gui.pixel(gui.yellow, pos);
+    try pagez.flush();
+    try waitForMouse();
+    gui.pixel(bg[0..4].*, pos);
+}
+
+var m: pagez.Mouse = undefined;
+fn waitForMouse() !void {
+    m = try pagez.readMouse();
+}
+
+fn updatePos(pos: *Point) void {
+    pos.x = @intCast(u16, max(0, (@intCast(i16, pos.x) + @intCast(i16, m.dx))));
+    if (pos.x + 8 >= pagez.display_size.x) { pos.x = pagez.display_size.x - 9; }
+    pos.y = @intCast(u16, max(0, (@intCast(i16, pos.y) + @intCast(i16, m.dy) * -1)));
+    if (pos.y + 8 >= pagez.display_size.y) { pos.y = pagez.display_size.y - 9; }
 }
 
 fn draw() !void {
