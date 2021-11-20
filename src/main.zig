@@ -22,7 +22,9 @@ pub fn main() !void {
         mp.y = @intCast(u16, max(0, (@intCast(i16, mp.y) + @intCast(i16, m.dy) * -1)));
         if (mp.y + 8 >= pagez.display_size.y) { mp.y = pagez.display_size.y - 9; }
 
-        bg = gui.colorAt(mp);
+        var i: u8 = 0;
+        const c = gui.colorAt(mp);
+        while (i < 4) : (i += 1) bg[i] = c[i];
         gui.pixel(gui.yellow, mp);
         try pagez.flush();
         m = try pagez.readMouse();
