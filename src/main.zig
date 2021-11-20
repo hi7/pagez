@@ -55,10 +55,10 @@ fn drawCursor(pos: Position) !void {
 }
 inline fn saveBgColorAt(pos: Position, offset: usize) void {
     const c = gui.colorAt(pos);
-    bg[offset] = c[offset];
-    bg[offset+1] = c[offset+1];
-    bg[offset+2] = c[offset+2];
-    bg[offset+3] = c[offset+3];
+    bg[offset] = c[0];
+    bg[offset+1] = c[1];
+    bg[offset+2] = c[2];
+    bg[offset+3] = c[3];
 }
 
 fn drawBackground(pos: Position) void {
