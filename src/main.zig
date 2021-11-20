@@ -95,8 +95,8 @@ fn updatePos(pos: *Position) void {
 
 fn draw() !void {
     pagez.clear();
-    gui.box(gui.white, Position{ .x = 0, .y = 0},  Size{ .x = 8, .y = 8});
-    gui.box(gui.white, Position{ .x = pagez.display_size.x-9, .y = 0}, Size{ .x = 8, .y = 8});
-    gui.box(gui.magenta, Position{ .x = 8, .y = 5},  Size{ .x = 3, .y = 3});
-    gui.box(gui.magenta, Position{ .x = pagez.display_size.x-12, .y = 5}, Size{ .x = 3, .y = 3});
+    gui.box(gui.white, Position{ .x = pagez.display_size.x / 2 - 50, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
+    gui.box(gui.white, Position{ .x = pagez.display_size.x / 2 + 50, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
+    gui.box(gui.red, Position{ .x = pagez.display_size.x / 2 - 25, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
+    gui.box(gui.red, Position{ .x = pagez.display_size.x / 2 + 25, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
 }
