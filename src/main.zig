@@ -44,19 +44,21 @@ const dots = [_]Point {
     Point{ .x = 0, .y = 2}, Point{ .x = 0, .y = 1},
 };
 fn drawCursor(pos: Position) !void {
-    for (dots) |dot| {
+    for (dots) |dot, index| {
         const p = Position { 
             .x = @intCast(u16, @intCast(i16, pos.x) + dot.x), 
             .y = @intCast(u16, @intCast(i16, pos.y) + dot.y), 
         };
-        saveBgColorAt(p);
+        saveBgColorAt(p, index * 4);
         gui.pixel(gui.yellow, p);
     }
 }
-inline fn saveBgColorAt(pos: Position) void {
+inline fn saveBgColorAt(pos: Position, offset: usize) void {
     const c = gui.colorAt(pos);
-    var i: u8 = 0;
-    while (i < 4) : (i += 1) bg[i] = c[i];
+    bg[offset] = c[offset];
+    bg[offset+1] = c[offset+1];
+    bg[offset+2] = c[offset+2];
+    bg[offset+3] = c[offset+3];
 }
 
 fn drawBackground(pos: Position) void {
