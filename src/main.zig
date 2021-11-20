@@ -30,7 +30,7 @@ fn center() Position {
     return Position{ .x = pagez.display_size.x / 2, .y = pagez.display_size.y / 2 };
 }
 
-const cursor_dots = 2;
+const cursor_dots = 8;
 const cursor_bytes = cursor_dots * 4;
 fn cursorBackground() [cursor_bytes]u8 {
    return @splat(cursor_bytes, @as(u8, 0));
