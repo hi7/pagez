@@ -105,7 +105,7 @@ pub fn readMouse() !Mouse {
 
 test "read mouse" {
     print("please press left move button.\n", .{});
-    try openMouse();
+    try init();
     const m = try readMouse();
     try testing.expect(m.dx == 0);
     try testing.expect(m.dy == 0);
