@@ -17,6 +17,8 @@ pub fn main() !void {
     while (!m.lmb) {
         updatePos(&pos);
         try drawCursor(pos);
+        try waitForMouse();
+        drawBackground(pos);
     }
     pagez.exit();
 }
@@ -32,18 +34,21 @@ fn cursorBackground() [cursor_bytes]u8 {
 }
 
 var bg = cursorBackground();
+const dots = []Point {};
 fn drawCursor(pos: Point) !void {
     var i: u8 = 0;
     const c = gui.colorAt(pos);
     while (i < 4) : (i += 1) bg[i] = c[i];
     gui.pixel(gui.yellow, pos);
     try pagez.flush();
-    try waitForMouse();
+}
+
+fn drawBackground(pos: Point) void {
     gui.pixel(bg[0..4].*, pos);
 }
 
 var m: pagez.Mouse = undefined;
-fn waitForMouse() !void {
+inline fn waitForMouse() !void {
     m = try pagez.readMouse();
 }
 
