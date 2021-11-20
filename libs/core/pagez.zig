@@ -44,7 +44,7 @@ pub fn init() !void {
     const mem_size: u32 = @as(u32, display_size.x) * @as(u32, display_size.y) * @as(u32, 4);
     bitmap = try allocator.alloc(u8, mem_size);
 }
-///`pub fn exit() void` call after using *readMouse()*.
+///`pub fn exit() void` call after using other functions.
 pub fn exit() void {
     fb0.close();
     mouse0.close();
@@ -59,7 +59,7 @@ test "files exists" {
 }
 
 pub fn resolution() !Size {
-    var virtual_Size = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_Size", .{ .read = true });
+    var virtual_Size = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
     defer virtual_Size.close();
 
     var buf: [15]u8 = undefined;
