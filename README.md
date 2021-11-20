@@ -1,2 +1,2 @@
 # pagez
-simple framebuffer display written in zig programming language
+Draw a simple cursor on framebuffer display (in zig programming language)

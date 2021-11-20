@@ -40,10 +40,8 @@ pub fn box(color: Vector(4, u8), pos: Point, size: Point) void {
     while (dy < size.y) : (dy += 1) {
         const y_offset:u32 = dy * pagez.display_size.x * @as(u32, 4);
         while (dx < size.x*4) : (dx += 4) {
-            pagez.bitmap[offset + y_offset + dx] = color[0];
-            pagez.bitmap[offset + y_offset + dx + 1] = color[1];
-            pagez.bitmap[offset + y_offset + dx + 2] = color[2];
-            pagez.bitmap[offset + y_offset + dx + 3] = color[3];
+            var i: u8 = 0;
+            while(i < std.mem.len(color)) : (i += 1) pagez.bitmap[offset + y_offset + dx + i] = color[0];
         }
         dx = 0;
     }

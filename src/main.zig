@@ -15,7 +15,7 @@ pub fn main() !void {
 
     var m = try pagez.readMouse();
     var mp = Point{ .x = pagez.display_size.x / 2, .y = pagez.display_size.y / 2 };
-    var bg = Vector(4, u8) { 0, 0, 0, 0, };
+    var bg = cursorBackground();
     while (!m.lmb) {
         mp.x = @intCast(u16, max(0, (@intCast(i16, mp.x) + @intCast(i16, m.dx))));
         if (mp.x + 8 >= pagez.display_size.x) { mp.x = pagez.display_size.x - 9; }
@@ -29,6 +29,11 @@ pub fn main() !void {
         gui.pixel(bg, mp);
     }
     pagez.exit();
+}
+
+const cursor_dots = 1;
+fn cursorBackground() Vector(cursor_dots*4, u8)  {
+   return @splat(cursor_dots*4, @as(u8, 0));
 }
 
 fn draw() !void {
