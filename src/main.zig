@@ -60,9 +60,23 @@ inline fn saveBgColorAt(pos: Position, offset: usize) void {
     bg[offset+2] = c[2];
     bg[offset+3] = c[3];
 }
+inline fn getColor(offset: usize) [4]u8 {
+    return [4]u8 {
+        bg[offset],
+        bg[offset+1],
+        bg[offset+2],
+        bg[offset+3],
+    };
+}
 
 fn drawBackground(pos: Position) void {
-    gui.pixel(bg[0..4].*, pos);
+    for (dots) |dot, index| {
+        const p = Position { 
+            .x = @intCast(u16, @intCast(i16, pos.x) + dot.x), 
+            .y = @intCast(u16, @intCast(i16, pos.y) + dot.y), 
+        };
+        gui.pixel(getColor(index*4), p);
+    }
 }
 
 var m: pagez.Mouse = undefined;
