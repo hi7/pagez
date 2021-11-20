@@ -95,8 +95,16 @@ fn updatePos(pos: *Position) void {
 
 fn draw() !void {
     pagez.clear();
-    gui.box(gui.white, Position{ .x = pagez.display_size.x / 2 - 50, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
-    gui.box(gui.white, Position{ .x = pagez.display_size.x / 2 + 50, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
-    gui.box(gui.red, Position{ .x = pagez.display_size.x / 2 - 25, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
-    gui.box(gui.red, Position{ .x = pagez.display_size.x / 2 + 25, .y = pagez.display_size.x / 2 - 4}, Size{ .x = 8, .y = 8});
+    gui.box(gui.white, Position{ 
+        .x = pagez.display_size.x / 2 - 50, 
+        .y = pagez.display_size.y / 2 - 4}, Size{ .x = 8, .y = 8});
+    gui.box(gui.white, Position{ 
+        .x = pagez.display_size.x / 2 + 50, 
+        .y = pagez.display_size.y / 2 - 4}, Size{ .x = 8, .y = 8});
+    gui.box(gui.red, Position{ 
+        .x = pagez.display_size.x / 2 - 25, 
+        .y = pagez.display_size.y / 2 - 4}, Size{ .x = 8, .y = 8});
+    gui.box(gui.red, Position{ 
+        .x = pagez.display_size.x / 2 + 25, 
+        .y = pagez.display_size.y / 2 - 4}, Size{ .x = 8, .y = 8});
 }
