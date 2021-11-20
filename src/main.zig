@@ -87,10 +87,10 @@ inline fn waitForMouse() !void {
 fn updatePos(pos: *Position) void {
     pos.x = @intCast(u16, max(0, (@intCast(i16, pos.x) + @intCast(i16, m.dx))));
     if (pos.x < 2) { pos.x = 2; }
-    if (pos.x + 8 >= pagez.display_size.x) { pos.x = pagez.display_size.x - 9; }
+    if (pos.x + 3 >= pagez.display_size.x) { pos.x = pagez.display_size.x - 3; }
     pos.y = @intCast(u16, max(0, (@intCast(i16, pos.y) + @intCast(i16, m.dy) * -1)));
-    if (pos.y < 2) { pos.y = 2; }
-    if (pos.y + 8 >= pagez.display_size.y) { pos.y = pagez.display_size.y - 9; }
+    if (pos.y < 3) { pos.y = 2; }
+    if (pos.y + 8 >= pagez.display_size.y) { pos.y = pagez.display_size.y - 3; }
 }
 
 fn draw() !void {
