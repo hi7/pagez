@@ -36,12 +36,13 @@ fn cursorBackground() [cursor_bytes]u8 {
    return @splat(cursor_bytes, @as(u8, 0));
 }
 
+const cursor_radius = 3;
 var bg = cursorBackground();
 const dots = [_]Point { 
-    Point{ .x = 0, .y = -2}, Point{ .x = 0, .y = -1},
-    Point{ .x = -2, .y = 0}, Point{ .x = -1, .y = 0},
-    Point{ .x = 2, .y = 0}, Point{ .x = 1, .y = 0},
-    Point{ .x = 0, .y = 2}, Point{ .x = 0, .y = 1},
+    Point{ .x = 0, .y = -2}, Point{ .x = 0, .y = -3},
+    Point{ .x = -2, .y = 0}, Point{ .x = -3, .y = 0},
+    Point{ .x = 2, .y = 0}, Point{ .x = 3, .y = 0},
+    Point{ .x = 0, .y = 2}, Point{ .x = 0, .y = 3},
 };
 fn drawCursor(pos: Position) !void {
     for (dots) |dot, index| {
@@ -86,11 +87,11 @@ inline fn waitForMouse() !void {
 
 fn updatePos(pos: *Position) void {
     pos.x = @intCast(u16, max(0, (@intCast(i16, pos.x) + @intCast(i16, m.dx))));
-    if (pos.x < 2) { pos.x = 2; }
-    if (pos.x + 3 >= pagez.display_size.x) { pos.x = pagez.display_size.x - 3; }
+    if (pos.x < cursor_radius) { pos.x = cursor_radius; }
+    if (pos.x + cursor_radius >= pagez.display_size.x) { pos.x = pagez.display_size.x - cursor_radius; }
     pos.y = @intCast(u16, max(0, (@intCast(i16, pos.y) + @intCast(i16, m.dy) * -1)));
-    if (pos.y < 3) { pos.y = 2; }
-    if (pos.y + 8 >= pagez.display_size.y) { pos.y = pagez.display_size.y - 3; }
+    if (pos.y < cursor_radius) { pos.y = cursor_radius; }
+    if (pos.y + cursor_radius + 1 >= pagez.display_size.y) { pos.y = pagez.display_size.y - cursor_radius - 1; }
 }
 
 fn draw() !void {
