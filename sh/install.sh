@@ -33,3 +33,8 @@ if [ ! -L $USERBIN/$ZIGBIN ]; then
 	if [[ $1 == $V ]]; then echo "ln -s $INSTDIR/$ZIGFILE/$ZIGBIN $USERBIN/$ZIGBIN"; fi
 fi
 
+if [ -d "$HOME/bin" ]; then
+	PATH="$HOME/bin:$PATH"
+	if [[ $1 == $V ]]; then echo "PATH=$HOME/bin:$PATH"; fi
+fi
+
