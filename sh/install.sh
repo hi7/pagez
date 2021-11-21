@@ -40,3 +40,12 @@ if [ -d "$HOME/bin" ]; then
 	PATH="$HOME/bin:$PATH"
 fi
 
+INPUT_COUNT=$(groups | grep input | wc -l);
+if [[ $INPUT_COUNT == 0 ]]; then
+    command -v sudo || {
+	echo "sudo not found! Please do as root: usermod -aG input $USER";
+	exit 1;
+    }
+    echo "sudo usermod -aG input $USER";
+    sudo usermod -aG input $USER
+fi
