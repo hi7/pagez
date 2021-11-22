@@ -5,6 +5,7 @@ if [[ "$1" == "-os" ]]; then OSTYPE="$2"; fi
 if [[ "$2" == "-os" ]]; then OSTYPE="$3"; fi
 if [[ "$1" == "-cpu" ]]; then CPUTYPE="$2"; fi
 if [[ "$2" == "-cpu" ]]; then CPUTYPE="$3"; fi
+if [[ "$3" == "-cpu" ]]; then CPUTYPE="$4"; fi
 if [[ "$4" == "-cpu" ]]; then CPUTYPE="$5"; fi
 if [[ ! "$CPUTYPE" ]]; then CPUTYPE=$(lscpu | grep Arch | cut -d : -f 2 | xargs); fi
 
