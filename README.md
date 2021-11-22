@@ -3,14 +3,14 @@ Draw a simple cursor on framebuffer display (in zig programming language)
 
 ### Install on Alpine Linux
 
-*Logged in as root:*
+Logged in as root:
 1. `localhost:~$ apk add git`
 2. `localhost:~$ adduser <user>`
 3. `localhost:~$ adduser <user> input`
 4. `localhost:~$ adduser <user> video`
 5. `localhost:~$ chgrp input /dev/input/mouse0`
 
-*Logged in as >>user<<:*
+Logged in as >>user<<:
 6. `localhost:~$ cd`
 7. `localhost:~$ mkdir -p src/zig`
 8. `localhost:~$ cd src/zig`
