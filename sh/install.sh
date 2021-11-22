@@ -1,18 +1,25 @@
-#!/bin/bash
-V=-v
-if [[ $1 == $V ]]; then echo "install pagez (verbose mode)"; fi
+#!/bin/sh
+V="-v"
+if [[ "$1" == $V ]]; then echo "install pagez (verbose mode)"; fi
+if [[ "$1" == "-os" ]]; then OSTYPE="$2"; fi
+if [[ "$2" == "-os" ]]; then OSTYPE="$3"; fi
+if [[ "$1" == "-cpu" ]]; then CPUTYPE="$2"; fi
+if [[ "$2" == "-cpu" ]]; then CPUTYPE="$3"; fi
+if [[ "$4" == "-cpu" ]]; then CPUTYPE="$5"; fi
+if [[ ! "$CPUTYPE" ]]; then CPUTYPE=$(lscpu | grep Arch | cut -d : -f 2 | xargs); fi
 
-INSTDIR=~/tools
+INSTDIR="$HOME/tools"
 if [ ! -d $INSTDIR ]; then
-	mkdir $INSTDIR;
 	if [[ $1 == $V ]]; then echo "mkdir $INSTDIR"; fi
+	mkdir $INSTDIR;
 fi
-ZIGVERSION=0.8.1
+
+ZIGVERSION="0.8.1"
 ZIGDLPATH="https://ziglang.org/download/$ZIGVERSION/"
 ZIGEXT=".tar.xz"
 ZIGBIN=zig
-CPUTYPE=$(lscpu | grep Arch | cut -d : -f 2 | xargs)
 ZIGFILE=${ZIGBIN}-${OSTYPE%%-*}-$CPUTYPE-$ZIGVERSION
+
 if [ ! -d $INSTDIR/$ZIGFILE ]; then
 	if [ ! -f $INSTDIR/$ZIGFILE$ZIGEXT ]; then
 		if [[ $1 == $V ]]; then echo wget -P $INSTDIR ${ZIGDLPATH}$ZIGFILE$ZIGEXT $INSTDIR; fi
