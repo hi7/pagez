@@ -50,9 +50,18 @@ fi
 INPUT_COUNT=$(groups | grep input | wc -l);
 if [[ $INPUT_COUNT == 0 ]]; then
     command -v sudo || {
-	echo "sudo not found! Please do as root: usermod -aG input $USER";
+	echo "sudo not found! Please do as root: adduser $USER input";
 	exit 1;
     }
-    echo "sudo usermod -aG input $USER";
-    sudo usermod -aG input $USER
+    echo "sudo adduser $USER input";
+    sudo adduser $USER input
+fi
+VIDEO_COUNT=$(groups | grep video | wc -l);
+if [[ $VIDEO_COUNT == 0 ]]; then
+    command -v sudo || {
+	echo "sudo not found! Please do as root: adduser $USER video";
+	exit 1;
+    }
+    echo "sudo adduser $USER video";
+    sudo adduser $USER video
 fi
