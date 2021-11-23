@@ -13,7 +13,7 @@ pub const magenta = [4]u8{ 255, 0, 255, 255 };
 pub const cyan = [4]u8{ 255, 255, 0, 255 };
 
 fn calcOffset(x: u16, y: u16) u32 {
-   return (@as(u32, pagez.display_size.x) * @as(u32, y) + @as(u32, x)) *% @as(u32, 4);
+    return (@as(u32, pagez.display_size.x) * @as(u32, y) + @as(u32, x)) *% @as(u32, 4);
 }
 
 pub fn colorAt(pos: Position) [4]u8 {
@@ -39,10 +39,10 @@ pub fn box(color: [4]u8, pos: Position, size: Size) void {
     var dx: u16 = 0;
     var dy: u16 = 0;
     while (dy < size.y) : (dy += 1) {
-        const y_offset:u32 = dy * pagez.display_size.x * @as(u32, 4);
-        while (dx < size.x*4) : (dx += 4) {
+        const y_offset: u32 = dy * pagez.display_size.x * @as(u32, 4);
+        while (dx < size.x * 4) : (dx += 4) {
             var i: u8 = 0;
-            while(i < std.mem.len(color)) : (i += 1) pagez.bitmap[offset + y_offset + dx + i] = color[i];
+            while (i < std.mem.len(color)) : (i += 1) pagez.bitmap[offset + y_offset + dx + i] = color[i];
         }
         dx = 0;
     }
