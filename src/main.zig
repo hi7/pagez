@@ -15,9 +15,8 @@ pub const io_mode = .evented;
 pub fn main() !void {
     try pagez.init();
 
-    var update_frame = async updateInput();
     var loop_frame = async mainLoop();
-    await loop_frame;
+    var update_frame = async updateInput();
     await update_frame;
 }
 
@@ -44,7 +43,7 @@ fn mainLoop() void {
             m.dx = 0;
             m.dy = 0;
             drawCursor(pos) catch |err| {
-                std.debug.print("drawCursor({s}) error: {s}\n", .{pos, err});
+                std.debug.print("drawCursor({s}) error: {s}\n", .{ pos, err });
             };
             pagez.flush() catch |err| {
                 std.debug.print("flush() error: {s}\n", .{err});
@@ -117,12 +116,12 @@ fn drawCursorBackground(pos: Position) void {
 }
 
 fn updateInput() void {
-    while(!m.rmb) {
+    while (!m.rmb) {
         waitForMouse();
     }
 }
 
-var m: pagez.Mouse = undefined;
+var m: Mouse = undefined;
 fn waitForMouse() void {
     m = pagez.readMouse() catch |err| {
         std.debug.print("readMouse() error: {s}\n", .{err});
@@ -131,10 +130,7 @@ fn waitForMouse() void {
 }
 
 fn updatePos(pos: Position) Position {
-    var result = Position {
-        .x = @intCast(u16, max(0, (@intCast(i16, pos.x) + @intCast(i16, m.dx)))),
-        .y = @intCast(u16, max(0, (@intCast(i16, pos.y) + @intCast(i16, m.dy) * -1)))
-    };
+    var result = Position{ .x = @intCast(u16, max(0, (@intCast(i16, pos.x) + @intCast(i16, m.dx)))), .y = @intCast(u16, max(0, (@intCast(i16, pos.y) + @intCast(i16, m.dy) * -1))) };
     if (result.x < cursor_radius) {
         result.x = cursor_radius;
     }
