@@ -8,28 +8,55 @@ const Point = pagez.Point;
 const Position = pagez.Position;
 const Size = pagez.Size;
 const expect = std.testing.expect;
+const Mouse = pagez.Mouse;
 
 pub const io_mode = .evented;
 
 pub fn main() !void {
     try pagez.init();
-    try draw();
-    try pagez.flush();
 
-    try waitForMouse();
-    var pos = center();
+    var update_frame = async updateInput();
+    var loop_frame = async mainLoop();
+    await loop_frame;
+    await update_frame;
+}
+
+inline fn isIdle(mouse: Mouse) bool {
+    return mouse.dx == 0 and mouse.dy == 0;
+}
+
+fn mainLoop() void {
+    draw() catch |err| {
+        std.debug.print("draw() error: {s}\n", .{err});
+    };
+    pagez.flush() catch |err| {
+        std.debug.print("flush() error: {s}\n", .{err});
+    };
     var time = std.time.milliTimestamp();
-    while (!m.lmb) {
-        updatePos(&pos);
-        try drawCursor(pos);
-        try pagez.flush();
-        var dt = std.time.milliTimestamp() - time;
-        if (dt > 1000) {
-            cursor_color = if (cursor_color[0] == 0) gui.magenta else gui.yellow;
-            time = std.time.milliTimestamp();
+    var pos = center();
+    drawCursor(pos) catch |err| {
+        std.debug.print("drawCursor() error: {s}\n", .{err});
+    };
+    while (!m.rmb) {
+        if (!isIdle(m)) {
+            drawCursorBackground(pos);
+            pos = updatePos(pos);
+            m.dx = 0;
+            m.dy = 0;
+            drawCursor(pos) catch |err| {
+                std.debug.print("drawCursor({s}) error: {s}\n", .{pos, err});
+            };
+            pagez.flush() catch |err| {
+                std.debug.print("flush() error: {s}\n", .{err});
+                return;
+            };
+            var dt = std.time.milliTimestamp() - time;
+            if (dt > 1000) {
+                cursor_color = if (cursor_color[0] == 0) gui.magenta else gui.yellow;
+                time = std.time.milliTimestamp();
+            }
         }
-        try waitForMouse();
-        drawBackground(pos);
+        std.time.sleep(100000);
     }
     pagez.exit();
 }
@@ -79,7 +106,7 @@ inline fn getColor(offset: usize) [4]u8 {
     };
 }
 
-fn drawBackground(pos: Position) void {
+fn drawCursorBackground(pos: Position) void {
     for (dots) |dot, index| {
         const p = Position{
             .x = @intCast(u16, @intCast(i16, pos.x) + dot.x),
@@ -89,26 +116,38 @@ fn drawBackground(pos: Position) void {
     }
 }
 
-var m: pagez.Mouse = undefined;
-fn waitForMouse() !void {
-    m = try pagez.readMouse();
+fn updateInput() void {
+    while(!m.rmb) {
+        waitForMouse();
+    }
 }
 
-fn updatePos(pos: *Position) void {
-    pos.x = @intCast(u16, max(0, (@intCast(i16, pos.x) + @intCast(i16, m.dx))));
-    if (pos.x < cursor_radius) {
-        pos.x = cursor_radius;
+var m: pagez.Mouse = undefined;
+fn waitForMouse() void {
+    m = pagez.readMouse() catch |err| {
+        std.debug.print("readMouse() error: {s}\n", .{err});
+        return;
+    };
+}
+
+fn updatePos(pos: Position) Position {
+    var result = Position {
+        .x = @intCast(u16, max(0, (@intCast(i16, pos.x) + @intCast(i16, m.dx)))),
+        .y = @intCast(u16, max(0, (@intCast(i16, pos.y) + @intCast(i16, m.dy) * -1)))
+    };
+    if (result.x < cursor_radius) {
+        result.x = cursor_radius;
     }
-    if (pos.x + cursor_radius >= pagez.display_size.x) {
-        pos.x = pagez.display_size.x - cursor_radius;
+    if (result.x + cursor_radius >= pagez.display_size.x) {
+        result.x = pagez.display_size.x - cursor_radius;
     }
-    pos.y = @intCast(u16, max(0, (@intCast(i16, pos.y) + @intCast(i16, m.dy) * -1)));
-    if (pos.y < cursor_radius) {
-        pos.y = cursor_radius;
+    if (result.y < cursor_radius) {
+        result.y = cursor_radius;
     }
-    if (pos.y + cursor_radius + 1 >= pagez.display_size.y) {
-        pos.y = pagez.display_size.y - cursor_radius - 1;
+    if (result.y + cursor_radius + 1 >= pagez.display_size.y) {
+        result.x = pagez.display_size.y - cursor_radius - 1;
     }
+    return result;
 }
 
 fn draw() !void {
