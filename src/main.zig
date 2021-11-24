@@ -15,17 +15,6 @@ pub const io_mode = .evented;
 pub fn main() !void {
     try pagez.init();
 
-    var loop_frame = async mainLoop();
-    var update_frame = async updateInput();
-    await loop_frame;
-    await update_frame;
-}
-
-inline fn isIdle(mouse: Mouse) bool {
-    return mouse.dx == 0 and mouse.dy == 0;
-}
-
-fn mainLoop() void {
     draw() catch |err| {
         std.debug.print("draw() error: {s}\n", .{err});
     };
@@ -56,9 +45,15 @@ fn mainLoop() void {
                 time = std.time.milliTimestamp();
             }
         }
-        std.time.sleep(100000);
+        var update_frame = async waitForMouse();
+        await update_frame;
+        //std.time.sleep(100000);
     }
     pagez.exit();
+}
+
+inline fn isIdle(mouse: Mouse) bool {
+    return mouse.dx == 0 and mouse.dy == 0;
 }
 
 fn center() Position {
@@ -113,12 +108,6 @@ fn drawCursorBackground(pos: Position) void {
             .y = @intCast(u16, @intCast(i16, pos.y) + dot.y),
         };
         gui.pixel(getColor(index * 4), p);
-    }
-}
-
-fn updateInput() void {
-    while (!m.rmb) {
-        waitForMouse();
     }
 }
 
