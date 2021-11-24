@@ -4,13 +4,14 @@ const gui = @import("gui");
 const fs = std.fs;
 const mem = std.mem;
 const max = std.math.max;
+const Thread = std.Thread;
 const Point = pagez.Point;
 const Position = pagez.Position;
 const Size = pagez.Size;
 const expect = std.testing.expect;
 const Mouse = pagez.Mouse;
 
-pub const io_mode = .evented;
+//pub const io_mode = .evented;
 
 pub fn main() !void {
     try pagez.init();
@@ -21,35 +22,40 @@ pub fn main() !void {
     pagez.flush() catch |err| {
         std.debug.print("flush() error: {s}\n", .{err});
     };
-    var time = std.time.milliTimestamp();
+
+    _ = try Thread.spawn(handleInput, 0);
+
     var pos = center();
-    drawCursor(pos) catch |err| {
-        std.debug.print("drawCursor() error: {s}\n", .{err});
-    };
+    updateCursor(pos);
+    var time = std.time.milliTimestamp();
     while (!m.rmb) {
         if (!isIdle(m)) {
             drawCursorBackground(pos);
             pos = updatePos(pos);
             m.dx = 0;
             m.dy = 0;
-            drawCursor(pos) catch |err| {
-                std.debug.print("drawCursor({s}) error: {s}\n", .{ pos, err });
-            };
-            pagez.flush() catch |err| {
-                std.debug.print("flush() error: {s}\n", .{err});
-                return;
-            };
-            var dt = std.time.milliTimestamp() - time;
-            if (dt > 1000) {
-                cursor_color = if (cursor_color[0] == 0) gui.magenta else gui.yellow;
-                time = std.time.milliTimestamp();
-            }
+            updateCursor(pos);
         }
-        var update_frame = async waitForMouse();
-        await update_frame;
-        //std.time.sleep(100000);
+        var dt = std.time.milliTimestamp() - time;
+        if (dt > 1000) {
+            drawCursorBackground(pos);
+            cursor_color = if (cursor_color[0] == 0) gui.magenta else gui.yellow;
+            updateCursor(pos);
+            time = std.time.milliTimestamp();
+        }
+        std.time.sleep(100000);
     }
     pagez.exit();
+}
+
+fn updateCursor(pos: Position) void {
+    drawCursor(pos) catch |err| {
+        std.debug.print("drawCursor({s}) error: {s}\n", .{ pos, err });
+    };
+    pagez.flush() catch |err| {
+        std.debug.print("flush() error: {s}\n", .{err});
+        return;
+    };
 }
 
 inline fn isIdle(mouse: Mouse) bool {
@@ -112,11 +118,14 @@ fn drawCursorBackground(pos: Position) void {
 }
 
 var m: Mouse = undefined;
-fn waitForMouse() void {
-    m = pagez.readMouse() catch |err| {
-        std.debug.print("readMouse() error: {s}\n", .{err});
-        return;
-    };
+fn handleInput(num: u8) u8 {
+    while (true) {
+        m = pagez.readMouse() catch |err| {
+            std.debug.print("readMouse() error: {s}\n", .{err});
+            return 1;
+        };
+    }
+    return num;
 }
 
 fn updatePos(pos: Position) Position {

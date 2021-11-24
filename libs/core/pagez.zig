@@ -31,7 +31,7 @@ pub const ParseError = error{
 pub fn init() !void {
     fb0 = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
     // user needs to be in group input: $ sudo adduser username input
-    mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true, .intended_io_mode = .evented });
+    mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true }); //, .intended_io_mode = .evented });
     display_size = try resolution();
     arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     allocator = &arena.allocator;
@@ -89,7 +89,6 @@ pub fn clear() void {
 ///`pub fn readMouse() !Mouse` blocking call to read position offset and mouse button status.
 pub fn readMouse() !Mouse {
     var buf: [3]u8 = undefined;
-    // Following call is blocking!!!
     var bytes_read = try mouse0.readAll(&buf);
     return Mouse{
         .dx = if (buf[1] >= 0x80) @intCast(i8, ~(buf[1] -% 1)) * -1 else @intCast(i8, buf[1]),
