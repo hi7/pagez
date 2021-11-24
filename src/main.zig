@@ -17,6 +17,7 @@ pub fn main() !void {
 
     var loop_frame = async mainLoop();
     var update_frame = async updateInput();
+    await loop_frame;
     await update_frame;
 }
 
