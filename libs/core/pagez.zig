@@ -10,6 +10,7 @@ var fb0: File = undefined;
 var mouse0: File = undefined;
 pub var bitmap: []u8 = undefined;
 pub var display_size: Size = undefined;
+pub var bits_per_pixel: u8 = undefined;
 
 pub const Point = struct { x: i16, y: i16 };
 pub const Position = struct { x: u16, y: u16 };
@@ -31,7 +32,8 @@ pub const ParseError = error{
 pub fn init() !void {
     fb0 = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
     // user needs to be in group input: $ sudo adduser username input
-    mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true }); //, .intended_io_mode = .evented });
+    mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true, .intended_io_mode = .evented, .lock_nonblocking = true });
+    bits_per_pixel = try bitsPerPixel();
     display_size = try resolution();
     arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     allocator = &arena.allocator;
@@ -52,27 +54,42 @@ test "files exists" {
     try fs.accessAbsolute("/dev/input/mouse0", .{ .read = true });
 }
 
-pub fn resolution() !Size {
-    var virtual_Size = try fs.openFileAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
-    defer virtual_Size.close();
-
-    var buf: [15]u8 = undefined;
-    var bytes_read = try virtual_Size.readAll(&buf);
-    // remove line feed at the end
-    if (!std.ascii.isDigit(buf[bytes_read])) {
-        bytes_read -= 1;
-    }
-    const separator = std.mem.indexOf(u8, buf[0..bytes_read], ",");
-    if (separator == null) return ParseError.SeparatorNotFound;
-    const width = std.fmt.parseInt(u16, buf[0..separator.?], 10) catch {
-        std.debug.print("{s} is no u16 value\n", .{buf[0..separator.?]});
+pub fn bitsPerPixel() !u8 {
+    var buf: [4]u8 = undefined;
+    var size = try readNumber("/sys/class/graphics/fb0/bits_per_pixel", &buf);
+    const bits_perPixel = std.fmt.parseInt(u8, buf[0..size], 10) catch {
+        std.debug.print("bits_per_pixel: {s} is no u8 value\n", .{buf[0..size]});
         return ParseError.NoIntegerValue;
     };
-    const height = std.fmt.parseInt(u16, buf[(separator.? + 1)..bytes_read], 10) catch {
-        std.debug.print("{s} is no u16 value\n", .{buf[(separator.? + 1)..bytes_read]});
+    return bits_per_pixel;
+}
+
+pub fn resolution() !Size {
+    var buf: [15]u8 = undefined;
+    var size = try readNumber("/sys/class/graphics/fb0/virtual_size", &buf);
+    const separator = std.mem.indexOf(u8, buf[0..size], ",");
+    if (separator == null) return ParseError.SeparatorNotFound;
+    const width = std.fmt.parseInt(u16, buf[0..separator.?], 10) catch {
+        std.debug.print("width: {s} is no u16 value\n", .{buf[0..separator.?]});
+        return ParseError.NoIntegerValue;
+    };
+    const height = std.fmt.parseInt(u16, buf[(separator.? + 1)..size], 10) catch {
+        std.debug.print("height: {s} is no u16 value\n", .{buf[(separator.? + 1)..size]});
         return ParseError.NoIntegerValue;
     };
     return Size{ .x = width, .y = height };
+}
+
+pub fn readNumber(path: []const u8, buffer: []u8) !usize {
+    var file = try fs.openFileAbsolute(path, .{ .read = true });
+    defer file.close();
+
+    var bytes_read = try file.readAll(buffer);
+    // remove line feed at the end
+    if (!std.ascii.isDigit(buffer[bytes_read])) {
+        bytes_read -= 1;
+    }
+    return bytes_read;
 }
 
 pub fn flush() fs.File.PWriteError!void {
