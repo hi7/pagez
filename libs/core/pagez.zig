@@ -121,14 +121,3 @@ pub fn readMouse() !Mouse {
         .rmb = (buf[0] & 0x02) == 0x02,
     };
 }
-
-test "read mouse" {
-    print("please press left move button.\n", .{});
-    try init();
-    const m = try readMouse();
-    try testing.expect(m.dx == 0);
-    try testing.expect(m.dy == 0);
-    try testing.expect(m.lmb == true);
-    try testing.expect(m.rmb == false);
-    exit();
-}
