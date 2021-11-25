@@ -34,7 +34,7 @@ pub const ParseError = error{
 pub fn init() !void {
     fb0 = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
     // user needs to be in group input: $ sudo adduser username input
-    mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true, .intended_io_mode = .evented, .lock_nonblocking = true });
+    mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true });
     bits_per_pixel = try bitsPerPixel();
     display_size = try resolution();
     arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
