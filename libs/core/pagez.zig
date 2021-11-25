@@ -12,7 +12,7 @@ var fb0: File = undefined;
 var mouse0: File = undefined;
 pub var bitmap: []u8 = undefined;
 pub var display_size: Size = undefined;
-pub var bits_per_pixel: u8 = undefined;
+pub var bytes_per_pixel: u8 = undefined;
 
 pub const Point = struct { x: i16, y: i16 };
 pub const Position = struct { x: u16, y: u16 };
@@ -35,7 +35,7 @@ pub fn init() !void {
     fb0 = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
     // user needs to be in group input: $ sudo adduser username input
     mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true });
-    bits_per_pixel = try bitsPerPixel();
+    bytes_per_pixel = (try bitsPerPixel()) / 8;
     display_size = try resolution();
     arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     allocator = &arena.allocator;
@@ -52,7 +52,6 @@ pub fn exit() void {
 
 test "files exists" {
     try fs.accessAbsolute("/sys/class/graphics/fb0/bits_per_pixel", .{ .read = true });
-    try expect((bitsPerPixel() catch 0) == 32);
     try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
     try fs.accessAbsolute("/dev/fb0", .{ .write = true });
     try fs.accessAbsolute("/dev/input/mouse0", .{ .read = true });
@@ -62,7 +61,7 @@ pub fn bitsPerPixel() !u8 {
     var buf: [4]u8 = undefined;
     var size = try readNumber("/sys/class/graphics/fb0/bits_per_pixel", &buf);
     return std.fmt.parseInt(u8, buf[0..size], 10) catch {
-        std.debug.print("bits_per_pixel: {s} is no u8 value\n", .{buf[0..size]});
+        std.debug.print("bitsPerPixel(): {s} is no u8 value\n", .{buf[0..size]});
         return ParseError.NoIntegerValue;
     };
 }
