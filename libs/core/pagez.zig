@@ -2,7 +2,9 @@ const std = @import("std");
 const testing = std.testing;
 const fs = std.fs;
 const File = fs.File;
+const expect = std.testing.expect;
 const print = std.debug.print;
+const parseInt = std.fmt.parseInt;
 
 var arena: std.heap.ArenaAllocator = undefined;
 var allocator: *std.mem.Allocator = undefined;
@@ -61,7 +63,12 @@ pub fn bitsPerPixel() !u8 {
         std.debug.print("bits_per_pixel: {s} is no u8 value\n", .{buf[0..size]});
         return ParseError.NoIntegerValue;
     };
+    std.debug.print("bitsPerPixel[0..{d}] {s} => {d}\n", .{ size, buf[0..size], bits_per_pixel });
     return bits_per_pixel;
+}
+
+test "parseInt" {
+    try expect((try parseInt(u8, "32", 10)) == 32);
 }
 
 pub fn resolution() !Size {
