@@ -51,6 +51,8 @@ pub fn exit() void {
 }
 
 test "files exists" {
+    try fs.accessAbsolute("/sys/class/graphics/fb0/bits_per_pixel", .{ .read = true });
+    try expect((bitsPerPixel() catch 0) == 32);
     try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
     try fs.accessAbsolute("/dev/fb0", .{ .write = true });
     try fs.accessAbsolute("/dev/input/mouse0", .{ .read = true });
@@ -59,12 +61,10 @@ test "files exists" {
 pub fn bitsPerPixel() !u8 {
     var buf: [4]u8 = undefined;
     var size = try readNumber("/sys/class/graphics/fb0/bits_per_pixel", &buf);
-    const bits_perPixel = std.fmt.parseInt(u8, buf[0..size], 10) catch {
+    return std.fmt.parseInt(u8, buf[0..size], 10) catch {
         std.debug.print("bits_per_pixel: {s} is no u8 value\n", .{buf[0..size]});
         return ParseError.NoIntegerValue;
     };
-    std.debug.print("bitsPerPixel[0..{d}] {s} => {d}\n", .{ size, buf[0..size], bits_per_pixel });
-    return bits_per_pixel;
 }
 
 pub fn resolution() !Size {
@@ -73,11 +73,11 @@ pub fn resolution() !Size {
     const separator = std.mem.indexOf(u8, buf[0..size], ",");
     if (separator == null) return ParseError.SeparatorNotFound;
     const width = std.fmt.parseInt(u16, buf[0..separator.?], 10) catch {
-        std.debug.print("width: {s} is no u16 value\n", .{buf[0..separator.?]});
+        print("width: {s} is no u16 value\n", .{buf[0..separator.?]});
         return ParseError.NoIntegerValue;
     };
     const height = std.fmt.parseInt(u16, buf[(separator.? + 1)..size], 10) catch {
-        std.debug.print("height: {s} is no u16 value\n", .{buf[(separator.? + 1)..size]});
+        print("height: {s} is no u16 value\n", .{buf[(separator.? + 1)..size]});
         return ParseError.NoIntegerValue;
     };
     return Size{ .x = width, .y = height };
