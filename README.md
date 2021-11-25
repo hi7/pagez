@@ -1,6 +1,29 @@
 # pagez
 Draw a simple cursor on framebuffer display (in zig programming language)
 
+### Install on DietPi
+
+Logged in as dietpi:
+1. `dietpi@DietPi:~$ sudo apt install git`
+2. `dietpi@DietPi:~$ cd`
+3. `dietpi@DietPi:~$ mkdir -p src/zig`
+4. `dietpi@DietPi:~$ cd src/zig`
+5. `dietpi@DietPi:~$ git config --global user.name "Your Name"` (optional)
+6. `dietpi@DietPi:~$ git config --global user.email "your@email.ad"` (optional)
+7. `dietpi@DietPi:~$ git clone https://github.com/hi7/pagez.git`
+8. `dietpi@DietPi:~$ cd pagez`
+9. `dietpi@DietPi:~$ sudo apt install xz-utils`
+10. `dietpi@DietPi:~$ sh/install.bash -os linux -cpu <CPUTYPE>` (CPUTYPE: armv7a, aarch64)
+11. `dietpi@DietPi:~$ nano ~/.profile` move to the end of the file and enter 
+`if [ -d ~/bin ]; then`
+`  PATH="$HOME/bin:$PATH"`
+`fi` (press Control & o, followed by Enter, than Control & x)
+12. `dietpi@DietPi:~$ source ~/.profile`
+13. `dietpi@DietPi:~$ zig version` 0.8.1
+14. `dietpi@DietPi:~$ zig build run`
+
+
+
 ### Install on Alpine Linux
 
 Logged in as root:
