@@ -99,9 +99,9 @@ pub fn flush() fs.File.PWriteError!void {
     _ = try fb0.write(bitmap);
 }
 
-pub fn clear() void {
+pub fn clear(color: [4]u8, size: u8) void {
     for (bitmap) |_, index| {
-        bitmap[index] = 0;
+        bitmap[index] = color[index % size];
     }
 }
 

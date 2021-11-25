@@ -10,6 +10,7 @@ const Position = pagez.Position;
 const Size = pagez.Size;
 const expect = std.testing.expect;
 const Mouse = pagez.Mouse;
+const sleep = std.time.sleep;
 
 //pub const io_mode = .evented;
 
@@ -38,13 +39,13 @@ pub fn main() !void {
             updateCursor(pos);
         }
         var dt = std.time.milliTimestamp() - time;
-        if (dt > 1000) {
+        if (dt > 850) {
             drawCursorBackground(pos);
             cursor_color = if (cursor_color[0] == 0) gui.white() else gui.black();
             updateCursor(pos);
             time = std.time.milliTimestamp();
         }
-        std.time.sleep(100000);
+        std.time.sleep(50000000);
     }
     pagez.exit();
 }
@@ -143,7 +144,7 @@ fn updatePos(pos: Position) Position {
 }
 
 fn draw() !void {
-    pagez.clear();
+    pagez.clear(gui.gray(), pagez.bytes_per_pixel);
     gui.box(gui.white(), Position{ .x = pagez.display_size.x / 2 - 50, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
     gui.box(gui.white(), Position{ .x = pagez.display_size.x / 2 + 50, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
     gui.box(gui.red(), Position{ .x = pagez.display_size.x / 2 - 25, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
