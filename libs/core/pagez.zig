@@ -51,7 +51,7 @@ pub fn exit() void {
 }
 
 test "files exists" {
-    try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_Size", .{ .read = true });
+    try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
     try fs.accessAbsolute("/dev/fb0", .{ .write = true });
     try fs.accessAbsolute("/dev/input/mouse0", .{ .read = true });
 }
@@ -65,10 +65,6 @@ pub fn bitsPerPixel() !u8 {
     };
     std.debug.print("bitsPerPixel[0..{d}] {s} => {d}\n", .{ size, buf[0..size], bits_per_pixel });
     return bits_per_pixel;
-}
-
-test "parseInt" {
-    try expect((try parseInt(u8, "32", 10)) == 32);
 }
 
 pub fn resolution() !Size {
