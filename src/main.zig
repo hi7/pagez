@@ -94,18 +94,14 @@ fn drawCursor(pos: Position) !void {
 }
 inline fn saveBgColorAt(pos: Position, offset: usize) void {
     const c = gui.colorAt(pos);
-    bg[offset] = c[0];
-    bg[offset + 1] = c[1];
-    bg[offset + 2] = c[2];
-    bg[offset + 3] = c[3];
+    var i: u8 = 0;
+    while (i < pagez.bytes_per_pixel) : (i += 1) bg[offset + i] = c[i];
 }
 inline fn getColor(offset: usize) [4]u8 {
-    return [4]u8{
-        bg[offset],
-        bg[offset + 1],
-        bg[offset + 2],
-        bg[offset + 3],
-    };
+    var i: u8 = 0;
+    var c: [4]u8 = undefined;
+    while (i < pagez.bytes_per_pixel) : (i += 1) c[i] = bg[offset + i];
+    return c;
 }
 
 fn drawCursorBackground(pos: Position) void {
