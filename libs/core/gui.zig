@@ -5,13 +5,30 @@ const Point = pagez.Point;
 const Position = pagez.Position;
 const Size = pagez.Size;
 
-pub const white = [_]u8{ 255, 255, 255, 255 };
-pub const yellow = [_]u8{ 0, 255, 255, 255 };
-pub const blue = [_]u8{ 255, 0, 0, 255 };
-pub const green = [_]u8{ 0, 255, 0, 255 };
-pub const red = [_]u8{ 0, 0, 255, 255 };
-pub const magenta = [_]u8{ 255, 0, 255, 255 };
-pub const cyan = [_]u8{ 255, 255, 0, 255 };
+pub fn black() [4]u8 {
+    return [4]u8{ 0, 0, 0, 0 };
+}
+pub fn white() [4]u8 {
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 255, 255, 255 } else [4]u8{ 0xFF, 0xFF, 0, 0 };
+}
+pub fn blue() [4]u8 {
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 0, 0, 255 } else [4]u8{ 0xF0, 0x0F, 0, 0 };
+}
+pub fn green() [4]u8 {
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 255, 0, 255 } else [4]u8{ 0x0F, 0x0F, 0, 0 };
+}
+pub fn red() [4]u8 {
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 0, 255, 255 } else [4]u8{ 0x00, 0xFF, 0, 0 };
+}
+pub fn yellow() [4]u8 {
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 255, 255, 255 } else [4]u8{ 0x0F, 0xFF, 0, 0 };
+}
+pub fn magenta() [4]u8 {
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 0, 255, 255 } else [4]u8{ 0xF0, 0xFF, 0, 0 };
+}
+pub fn cyan() [4]u8 {
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 255, 0, 255 } else [4]u8{ 0xFF, 0x0F, 0, 0 };
+}
 
 fn calcOffset(x: u16, y: u16) u32 {
     return (@as(u32, pagez.display_size.x) * @as(u32, y) + @as(u32, x)) *% @as(u32, pagez.bytes_per_pixel);
@@ -22,7 +39,7 @@ pub fn colorAt(pos: Position) []u8 {
     var color: [4]u8 = undefined;
     var i: u8 = 0;
     while (i < pagez.bytes_per_pixel) : (i += 1) color[i] = pagez.bitmap[offset + i];
-    return &color;
+    return color[0..pagez.bytes_per_pixel];
 }
 
 pub fn pixel(color: [4]u8, pos: Position) void {

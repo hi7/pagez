@@ -26,6 +26,7 @@ pub fn main() !void {
     _ = try Thread.spawn(handleInput, 0);
 
     var pos = center();
+    cursor_color = gui.yellow();
     updateCursor(pos);
     var time = std.time.milliTimestamp();
     while (!m.rmb) {
@@ -39,7 +40,7 @@ pub fn main() !void {
         var dt = std.time.milliTimestamp() - time;
         if (dt > 1000) {
             drawCursorBackground(pos);
-            cursor_color = if (cursor_color[0] == 0) gui.magenta else gui.yellow;
+            cursor_color = if ((cursor_color[0] & 0xF0) == 0) gui.magenta() else gui.yellow();
             updateCursor(pos);
             time = std.time.milliTimestamp();
         }
@@ -80,7 +81,7 @@ const dots = [_]Point{
     Point{ .x = 2, .y = 0 },  Point{ .x = 3, .y = 0 },
     Point{ .x = 0, .y = 2 },  Point{ .x = 0, .y = 3 },
 };
-var cursor_color = gui.yellow;
+var cursor_color: [4]u8 = undefined;
 fn drawCursor(pos: Position) !void {
     for (dots) |dot, index| {
         const p = Position{
@@ -147,8 +148,8 @@ fn updatePos(pos: Position) Position {
 
 fn draw() !void {
     pagez.clear();
-    gui.box(gui.white, Position{ .x = pagez.display_size.x / 2 - 50, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
-    gui.box(gui.white, Position{ .x = pagez.display_size.x / 2 + 50, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
-    gui.box(gui.red, Position{ .x = pagez.display_size.x / 2 - 25, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
-    gui.box(gui.red, Position{ .x = pagez.display_size.x / 2 + 25, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
+    gui.box(gui.white(), Position{ .x = pagez.display_size.x / 2 - 50, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
+    gui.box(gui.white(), Position{ .x = pagez.display_size.x / 2 + 50, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
+    gui.box(gui.red(), Position{ .x = pagez.display_size.x / 2 - 25, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
+    gui.box(gui.red(), Position{ .x = pagez.display_size.x / 2 + 25, .y = pagez.display_size.y / 2 - 4 }, Size{ .x = 8, .y = 8 });
 }
