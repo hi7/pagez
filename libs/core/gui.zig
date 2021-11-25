@@ -24,7 +24,7 @@ pub fn white() [4]u8 {
     return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 255, 255, 255 } else [4]u8{ 0xFF, 0xFF, 0, 0 };
 }
 pub fn gray() [4]u8 {
-    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0x7F, 0x7F, 0x7F, 255 } else to16bitColor(16, 16, 32);
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0x7F, 0x7F, 0x7F, 255 } else to16bitColor(16, 32, 16);
 }
 pub fn blue() [4]u8 {
     return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 0, 0, 255 } else [4]u8{ 0xF8, 0x00, 0, 0 };
