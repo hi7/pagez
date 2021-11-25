@@ -26,7 +26,7 @@ pub fn main() !void {
     _ = try Thread.spawn(handleInput, 0);
 
     var pos = center();
-    cursor_color = gui.yellow();
+    cursor_color = gui.white();
     updateCursor(pos);
     var time = std.time.milliTimestamp();
     while (!m.rmb) {
@@ -40,7 +40,7 @@ pub fn main() !void {
         var dt = std.time.milliTimestamp() - time;
         if (dt > 1000) {
             drawCursorBackground(pos);
-            cursor_color = if ((cursor_color[0] & 0xF0) == 0) gui.magenta() else gui.yellow();
+            cursor_color = if (cursor_color[0] == 0) gui.white() else gui.black();
             updateCursor(pos);
             time = std.time.milliTimestamp();
         }

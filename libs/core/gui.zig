@@ -12,13 +12,13 @@ pub fn white() [4]u8 {
     return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 255, 255, 255 } else [4]u8{ 0xFF, 0xFF, 0, 0 };
 }
 pub fn blue() [4]u8 {
-    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 0, 0, 255 } else [4]u8{ 0xF0, 0x0F, 0, 0 };
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 0, 0, 255 } else [4]u8{ 0xF8, 0x00, 0, 0 };
 }
 pub fn green() [4]u8 {
-    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 255, 0, 255 } else [4]u8{ 0x0F, 0x0F, 0, 0 };
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 255, 0, 255 } else [4]u8{ 0x00, 0x2F, 0, 0 };
 }
 pub fn red() [4]u8 {
-    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 0, 255, 255 } else [4]u8{ 0x00, 0xFF, 0, 0 };
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 0, 255, 255 } else [4]u8{ 0x02, 0xB0, 0, 0 };
 }
 pub fn yellow() [4]u8 {
     return if (pagez.bytes_per_pixel == 4) [4]u8{ 0, 255, 255, 255 } else [4]u8{ 0x0F, 0xFF, 0, 0 };
@@ -27,7 +27,7 @@ pub fn magenta() [4]u8 {
     return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 0, 255, 255 } else [4]u8{ 0xF0, 0xFF, 0, 0 };
 }
 pub fn cyan() [4]u8 {
-    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 255, 0, 255 } else [4]u8{ 0xFF, 0x0F, 0, 0 };
+    return if (pagez.bytes_per_pixel == 4) [4]u8{ 255, 255, 0, 255 } else [4]u8{ 0xF8, 0x0F, 0, 0 };
 }
 
 fn calcOffset(x: u16, y: u16) u32 {
