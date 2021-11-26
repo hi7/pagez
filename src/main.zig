@@ -4,6 +4,7 @@ const gui = @import("gui");
 const fs = std.fs;
 const mem = std.mem;
 const max = std.math.max;
+const print = std.debug.print;
 const Thread = std.Thread;
 const Point = pagez.Point;
 const Position = pagez.Position;
@@ -17,12 +18,8 @@ const sleep = std.time.sleep;
 pub fn main() !void {
     try pagez.init();
 
-    draw() catch |err| {
-        std.debug.print("draw() error: {s}\n", .{err});
-    };
-    pagez.flush() catch |err| {
-        std.debug.print("flush() error: {s}\n", .{err});
-    };
+    try draw();
+    try pagez.flush();
 
     _ = try Thread.spawn(handleInput, 0);
 
@@ -32,7 +29,7 @@ pub fn main() !void {
     var time = std.time.milliTimestamp();
     while (!m.rmb) {
         if (!isIdle(m)) {
-            drawCursorBackground(pos);
+            drawCursorBackground(pos, true);
             pos = updatePos(pos);
             m.dx = 0;
             m.dy = 0;
@@ -40,7 +37,7 @@ pub fn main() !void {
         }
         var dt = std.time.milliTimestamp() - time;
         if (dt > 850) {
-            drawCursorBackground(pos);
+            drawCursorBackground(pos, false);
             cursor_color = if (cursor_color[0] == 0) gui.white() else gui.black();
             updateCursor(pos);
             time = std.time.milliTimestamp();
@@ -51,12 +48,8 @@ pub fn main() !void {
 }
 
 fn updateCursor(pos: Position) void {
-    drawCursor(pos) catch |err| {
-        std.debug.print("drawCursor({s}) error: {s}\n", .{ pos, err });
-    };
-    pagez.flush() catch |err| {
-        std.debug.print("flush() error: {s}\n", .{err});
-        return;
+    drawCursor(pos, true) catch |err| {
+        print("drawCursor({s}) error: {s}\n", .{ pos, err });
     };
 }
 
@@ -83,7 +76,7 @@ const dots = [_]Point{
     Point{ .x = 0, .y = 2 },  Point{ .x = 0, .y = 3 },
 };
 var cursor_color: [4]u8 = undefined;
-fn drawCursor(pos: Position) !void {
+fn drawCursor(pos: Position, flush: bool) !void {
     for (dots) |dot, index| {
         const p = Position{
             .x = @intCast(u16, @intCast(i16, pos.x) + dot.x),
@@ -91,6 +84,9 @@ fn drawCursor(pos: Position) !void {
         };
         saveBgColorAt(p, index * 4);
         gui.pixel(cursor_color, p);
+        if (flush) {
+            try pagez.flushData(&cursor_color, gui.calcOffset(p));
+        }
     }
 }
 inline fn saveBgColorAt(pos: Position, offset: usize) void {
@@ -98,20 +94,25 @@ inline fn saveBgColorAt(pos: Position, offset: usize) void {
     var i: u8 = 0;
     while (i < pagez.bytes_per_pixel) : (i += 1) bg[offset + i] = c[i];
 }
-inline fn getColor(offset: usize) [4]u8 {
+inline fn cursorBackgroundColor(offset: usize) [4]u8 {
     var i: u8 = 0;
     var c: [4]u8 = undefined;
     while (i < pagez.bytes_per_pixel) : (i += 1) c[i] = bg[offset + i];
     return c;
 }
-
-fn drawCursorBackground(pos: Position) void {
+fn drawCursorBackground(pos: Position, flush: bool) void {
     for (dots) |dot, index| {
         const p = Position{
             .x = @intCast(u16, @intCast(i16, pos.x) + dot.x),
             .y = @intCast(u16, @intCast(i16, pos.y) + dot.y),
         };
-        gui.pixel(getColor(index * 4), p);
+        var bgColor: [4]u8 = cursorBackgroundColor(index * pagez.bytes_per_pixel);
+        gui.pixel(bgColor, p);
+        if (flush) {
+            pagez.flushData(bgColor[0..pagez.bytes_per_pixel], gui.calcOffset(p)) catch |err| {
+                print("drawCursorBackground() error: {s}\n", .{err});
+            };
+        }
     }
 }
 
@@ -119,7 +120,7 @@ var m: Mouse = undefined;
 fn handleInput(num: u8) u8 {
     while (true) {
         m = pagez.readMouse() catch |err| {
-            std.debug.print("readMouse() error: {s}\n", .{err});
+            print("readMouse() error: {s}\n", .{err});
             return 1;
         };
     }

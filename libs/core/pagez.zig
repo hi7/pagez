@@ -98,6 +98,14 @@ pub fn flush() fs.File.PWriteError!void {
     try fb0.seekTo(0);
     _ = try fb0.write(bitmap);
 }
+pub fn flushBitmapStripe(offset: usize, len: usize) fs.File.PWriteError!void {
+    try fb0.seekTo(offset);
+    _ = try fb0.write(bitmap[offset..(offset + len)]);
+}
+pub fn flushData(data: []u8, offset: usize) fs.File.PWriteError!void {
+    try fb0.seekTo(offset);
+    _ = try fb0.write(data);
+}
 
 pub fn clear(color: [4]u8, size: u8) void {
     for (bitmap) |_, index| {
