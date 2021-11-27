@@ -9,6 +9,7 @@ const parseInt = std.fmt.parseInt;
 var arena: std.heap.ArenaAllocator = undefined;
 var allocator: *std.mem.Allocator = undefined;
 var fb0: File = undefined;
+var kbd: File = undefined;
 var mouse0: File = undefined;
 pub var bitmap: []u8 = undefined;
 pub var display_size: Size = undefined;
@@ -34,6 +35,7 @@ pub const ParseError = error{
 pub fn init() !void {
     fb0 = try fs.openFileAbsolute("/dev/fb0", .{ .write = true });
     // user needs to be in group input: $ sudo adduser username input
+    kbd = try fs.openFileAbsolute("/dev/input/event2", .{ .read = true });
     mouse0 = try fs.openFileAbsolute("/dev/input/mouse0", .{ .read = true });
     bytes_per_pixel = (try bitsPerPixel()) / 8;
     display_size = try resolution();
@@ -54,7 +56,15 @@ test "files exists" {
     try fs.accessAbsolute("/sys/class/graphics/fb0/bits_per_pixel", .{ .read = true });
     try fs.accessAbsolute("/sys/class/graphics/fb0/virtual_size", .{ .read = true });
     try fs.accessAbsolute("/dev/fb0", .{ .write = true });
+    try fs.accessAbsolute("/dev/input/event2", .{ .read = true });
     try fs.accessAbsolute("/dev/input/mouse0", .{ .read = true });
+}
+
+test "file readable" {
+    print("Please press a key.");
+    var buffer: [40]u8 = undefined;
+    var bytes_read = try file.readAll(buffer);
+    expect(bytes_read > 0);
 }
 
 pub fn bitsPerPixel() !u8 {
