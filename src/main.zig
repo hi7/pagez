@@ -70,10 +70,10 @@ fn cursorBackground() [cursor_bytes]u8 {
 const cursor_radius = 3;
 var bg = cursorBackground();
 const dots = [_]Point{
-    Point{ .x = 0, .y = -2 }, Point{ .x = 0, .y = -3 },
-    Point{ .x = -2, .y = 0 }, Point{ .x = -3, .y = 0 },
-    Point{ .x = 2, .y = 0 },  Point{ .x = 3, .y = 0 },
-    Point{ .x = 0, .y = 2 },  Point{ .x = 0, .y = 3 },
+    Point{ .x = 2, .y = 0 }, Point{ .x = 3, .y = 0 },
+    Point{ .x = 4, .y = 0 }, Point{ .x = 5, .y = 0 },
+    Point{ .x = 0, .y = 2 }, Point{ .x = 0, .y = 3 },
+    Point{ .x = 0, .y = 4 }, Point{ .x = 0, .y = 5 },
 };
 var cursor_color: [4]u8 = undefined;
 fn drawCursor(pos: Position, flush: bool) !void {
